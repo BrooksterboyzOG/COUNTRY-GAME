@@ -149,7 +149,7 @@
                 document.getElementById("result").classList.remove("wrong");
                 score += 10;
             } else {
-                document.getElementById("result").innerText = "❌ Wrong! Try again.";
+                document.getElementById("result").innerText = `❌ Incorrect! The correct answer is ${questions[previousIndex].name}.`;
                 document.getElementById("result").classList.add("wrong");
                 document.getElementById("result").classList.remove("correct");
                 score -= 5;
