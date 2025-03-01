@@ -39,10 +39,12 @@
       font-weight: bold;
       margin-top: 10px;
     }
-    #timer {
+    #timer, #progress {
       font-size: 18px;
       margin-top: 10px;
     }
+    .correct { color: green; }
+    .wrong { color: red; }
     body.dark-mode {
       background-color: #333;
       color: white;
@@ -50,6 +52,10 @@
     #lobby.dark-mode, #game-container.dark-container, #game-over.dark-container {
       background-color: #444;
       color: white;
+    }
+    #leaderboard {
+      margin-top: 20px;
+      text-align: left;
     }
   </style>
 </head>
@@ -99,6 +105,7 @@
   <div id="game-over" style="display: none;">
     <h2>Game Over!</h2>
     <p id="finalScore"></p>
+    <div id="leaderboard"></div>
     <button onclick="returnToLobby()">Return to Lobby</button>
   </div>
 
@@ -109,62 +116,74 @@
         easy: [
           { name: "Canada", fact: "This country has the longest coastline in the world." },
           { name: "Brazil", fact: "This country is the largest in South America." },
-          { name: "India", fact: "This country has the second-largest population." }
+          { name: "India", fact: "This country has the second-largest population." },
+          { name: "Australia", fact: "This country is an island continent." }
         ],
         medium: [
           { name: "China", fact: "This country has the largest population in the world." },
           { name: "Russia", fact: "This country is the largest by land area." },
-          { name: "Germany", fact: "This country has the largest economy in Europe." }
+          { name: "Germany", fact: "This country has the largest economy in Europe." },
+          { name: "Argentina", fact: "This country is the second largest in South America." }
         ],
         hard: [
           { name: "Kazakhstan", fact: "This is the largest landlocked country in the world." },
           { name: "Mongolia", fact: "This country has the lowest population density." },
-          { name: "Liechtenstein", fact: "This country is one of the smallest in the world." }
+          { name: "Liechtenstein", fact: "This country is one of the smallest in the world." },
+          { name: "Bhutan", fact: "This country is known for its measure of Gross National Happiness." }
         ]
       },
       capitals: {
         easy: [
           { name: "Australia", fact: "This country's capital is Canberra." },
           { name: "USA", fact: "This country's capital is Washington, D.C." },
-          { name: "France", fact: "This country's capital is Paris." }
+          { name: "France", fact: "This country's capital is Paris." },
+          { name: "Egypt", fact: "This country's capital is Cairo." }
         ],
         medium: [
           { name: "Japan", fact: "This country's capital is Tokyo." },
           { name: "Italy", fact: "This country's capital is Rome." },
-          { name: "Canada", fact: "This country's capital is Ottawa." }
+          { name: "Canada", fact: "This country's capital is Ottawa." },
+          { name: "India", fact: "This country's capital is New Delhi." }
         ],
         hard: [
           { name: "Bhutan", fact: "This country's capital is Thimphu." },
           { name: "Malawi", fact: "This country's capital is Lilongwe." },
-          { name: "Lesotho", fact: "This country's capital is Maseru." }
+          { name: "Lesotho", fact: "This country's capital is Maseru." },
+          { name: "Eswatini", fact: "This country's capital is Mbabane (administrative) and Lobamba (royal/legislative)." }
         ]
       },
       gdp: {
         easy: [
           { name: "USA", fact: "This country has the largest GDP in the world." },
           { name: "China", fact: "This country has the second-largest GDP in the world." },
-          { name: "Germany", fact: "This country has the largest GDP in Europe." }
+          { name: "Germany", fact: "This country has the largest GDP in Europe." },
+          { name: "Japan", fact: "This country has the third-largest GDP in the world." }
         ],
         medium: [
           { name: "India", fact: "This country has the fifth-largest GDP in the world." },
-          { name: "Japan", fact: "This country has the third-largest GDP in the world." },
-          { name: "United Kingdom", fact: "This country has the sixth-largest GDP in the world." }
+          { name: "United Kingdom", fact: "This country has the sixth-largest GDP in the world." },
+          { name: "France", fact: "This country is one of the largest economies in Europe." },
+          { name: "Brazil", fact: "This country is the largest economy in South America." }
         ],
         hard: [
           { name: "Luxembourg", fact: "This country has the highest GDP per capita." },
           { name: "Switzerland", fact: "This country has one of the highest GDPs per capita." },
-          { name: "Norway", fact: "This country is known for its high GDP per capita." }
+          { name: "Norway", fact: "This country is known for its high GDP per capita." },
+          { name: "Singapore", fact: "This country has a very high GDP per capita due to its financial sector." }
         ]
       }
-      // You can add more categories as needed.
+      // Add additional categories if desired.
     };
 
+    // Sound effects
+    const correctSound = new Audio('correct.mp3');
+    const wrongSound = new Audio('wrong.mp3');
+    
     // Global game state variables.
     let currentCategory, currentDifficulty, currentQuestions, currentQuestionIndex, score, timer, timeLeft, hintUsed, playerName;
 
     // Starts the game from the lobby.
     function startGame() {
-      // Retrieve lobby values.
       playerName = document.getElementById("playerName").value || "Player";
       currentCategory = document.getElementById("category").value;
       currentDifficulty = document.getElementById("difficulty").value;
@@ -184,7 +203,7 @@
 
     // Loads the current question or ends the game if no more questions.
     function loadQuestion() {
-      clearInterval(timer); // Clear any previous timer.
+      clearInterval(timer);
       if (currentQuestionIndex >= currentQuestions.length) {
         gameOver();
         return;
@@ -194,21 +213,18 @@
       document.querySelector('button[onclick="checkGuess()"]').disabled = false;
       document.getElementById("guess").value = "";
       document.getElementById("result").innerText = "";
-      // Display progress.
       document.getElementById("progress").innerText = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
-      // Display the current fact.
       document.getElementById("fact").innerText = currentQuestions[currentQuestionIndex].fact;
-      // Start the timer.
       startTimer();
     }
 
-    // Starts the countdown timer for the current question.
+    // Starts the countdown timer.
     function startTimer() {
       timeLeft = 10;
       document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
       timer = setInterval(() => {
         timeLeft--;
-        if (timeLeft < 0) timeLeft = 0; // Prevent negative display.
+        if (timeLeft < 0) timeLeft = 0;
         document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
         if (timeLeft === 0) {
           clearInterval(timer);
@@ -219,11 +235,12 @@
           document.getElementById("score").innerText = `Score: ${score}`;
           document.getElementById("guess").disabled = true;
           document.querySelector('button[onclick="checkGuess()"]').disabled = true;
+          // Auto-move to next question after time up
         }
       }, 1000);
     }
 
-    // Checks the player's guess against the current question.
+    // Checks the player's guess.
     function checkGuess() {
       clearInterval(timer);
       const userGuess = document.getElementById("guess").value.trim().toLowerCase();
@@ -233,11 +250,13 @@
         document.getElementById("result").classList.add("correct");
         document.getElementById("result").classList.remove("wrong");
         score += 10;
+        correctSound.play();
       } else {
         document.getElementById("result").innerText = `❌ Incorrect! The correct answer is ${currentQuestions[currentQuestionIndex].name}.`;
         document.getElementById("result").classList.add("wrong");
         document.getElementById("result").classList.remove("correct");
         score -= 5;
+        wrongSound.play();
       }
       document.getElementById("score").innerText = `Score: ${score}`;
     }
@@ -249,7 +268,7 @@
       loadQuestion();
     }
 
-    // Provides a hint (first letter of the country) for the current question.
+    // Provides a hint (first letter) for the current question.
     function getHint() {
       if (hintUsed) {
         document.getElementById("result").innerText = "❌ You have already used a hint!";
@@ -265,12 +284,31 @@
     // Ends the game and shows the Game Over screen.
     function gameOver() {
       clearInterval(timer);
+      updateLeaderboard();
       document.getElementById("game-container").style.display = "none";
       document.getElementById("game-over").style.display = "block";
       document.getElementById("finalScore").innerText = `Final Score: ${score}`;
     }
 
-    // Returns to the lobby to allow a new game.
+    // Updates and displays the leaderboard.
+    function updateLeaderboard() {
+      let leaderboardData = JSON.parse(localStorage.getItem("leaderboard")) || [];
+      leaderboardData.push({ name: playerName, score: score });
+      leaderboardData.sort((a, b) => b.score - a.score);
+      leaderboardData = leaderboardData.slice(0, 5); // Top 5 scores.
+      localStorage.setItem("leaderboard", JSON.stringify(leaderboardData));
+      displayLeaderboard(leaderboardData);
+    }
+
+    function displayLeaderboard(data) {
+      let leaderboardHTML = "<h3>Leaderboard</h3>";
+      data.forEach((entry, index) => {
+        leaderboardHTML += `<p>${index + 1}. ${entry.name}: ${entry.score}</p>`;
+      });
+      document.getElementById("leaderboard").innerHTML = leaderboardHTML;
+    }
+
+    // Returns to the lobby to start a new game.
     function returnToLobby() {
       document.getElementById("game-over").style.display = "none";
       document.getElementById("lobby").style.display = "block";
