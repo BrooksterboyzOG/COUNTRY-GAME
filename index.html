@@ -63,6 +63,7 @@
 <body>
     <div id="game-container">
         <h1>Guess the Country!</h1>
+        <p id="category-name">Category: General Facts</p>
         <label for="category">Choose a category:</label>
         <select id="category" onchange="changeCategory()">
             <option value="general">General Facts</option>
@@ -168,17 +169,25 @@
 
         function changeCategory() {
             currentCategory = document.getElementById("category").value;
-            loadCountry();
+            document.getElementById("category-name").innerText = `Category: ${document.getElementById("category").options[document.getElementById("category").selectedIndex].text}`;
+            resetGame(); // Reset the game when changing the category
         }
 
         function changeDifficulty() {
             currentDifficulty = document.getElementById("difficulty").value;
-            loadCountry();
+            loadCountry(); // Load a new question based on difficulty change
+        }
+
+        function resetGame() {
+            score = 0;
+            document.getElementById("score").innerText = `Score: ${score}`;
+            loadCountry(); // Load a question from the new category
         }
 
         loadCountry(); // Initial question load
     </script>
 </body>
 </html>
+
 
 
