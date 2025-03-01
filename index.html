@@ -142,7 +142,7 @@
             const questions = countries[currentCategory][currentDifficulty];
             if (!questions) return;
             const correctCountry = questions[previousIndex].name.toLowerCase();
-            
+
             if (userGuess === correctCountry) {
                 document.getElementById("result").innerText = "✅ Correct!";
                 document.getElementById("result").classList.add("correct");
@@ -155,10 +155,15 @@
                 score -= 5;
             }
             document.getElementById("score").innerText = `Score: ${score}`;
+            document.getElementById("guess").disabled = true; // Disable input after answering
+            document.querySelector('button[onclick="checkGuess()"]').disabled = true; // Disable submit button
         }
 
         function nextCountry() {
-            loadCountry();
+            document.getElementById("guess").disabled = false; // Enable input for the next question
+            document.querySelector('button[onclick="checkGuess()"]').disabled = false; // Enable submit button
+            loadCountry(); // Load a new question
+            document.getElementById("result").innerText = ""; // Reset result text
         }
 
         function changeCategory() {
@@ -171,8 +176,9 @@
             loadCountry();
         }
 
-        loadCountry();
+        loadCountry(); // Initial question load
     </script>
 </body>
 </html>
+
 
