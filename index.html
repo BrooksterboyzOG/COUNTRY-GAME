@@ -1,1 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Country</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        #game-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+        }
+        input, button, select {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 10px;
+        }
+        #result.correct {
+            color: green;
+        }
+        #result.wrong {
+            color: red;
+        }
+        select {
+            width: 200px;
+        }
+        @media (max-width: 600px) {
+            #game-container {
+                width: 90%;
+            }
+            select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Guess the Country!</h1>
+        <label for="category">Choose a category:</label>
+        <select id="category" onchange="changeCategory()">
+            <option value="general">General Facts</option>
+            <option value="capitals">Capitals</option>
+            <option value="gdp">GDP</option>
+            <option value="size">Size</option>
+            <option value="military">Military Rank</option>
+            <option value="population">Population</option>
+            <option value="tourism">Tourism</option>
+            <option value="languages">Languages</option>
+            <option value="history">Historical Events</option>
+            <option value="flag">Flag Colors</option>
+            <option value="currency">Currency</option>
+            <option value="exports">Major Exports</option>
+            <option value="geography">Geography</option>
+        </select>
+        <br>
+        <label for="difficulty">Choose difficulty:</label>
+        <select id="difficulty" onchange="changeDifficulty()">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <p id="fact"></p>
+        <input type="text" id="guess" placeholder="Enter country name" aria-label="Country name input">
+        <button onclick="checkGuess()">Submit</button>
+        <p id="result"></p>
+        <button onclick="nextCountry()">Next</button>
+        <p id="score">Score: 0</p>
+    </div>
+
+    <script>
+        const countries = {
+            general: {
+                easy: [
+                    { name: "Canada", fact: "This country has the longest coastline in the world." },
+                    { name: "Brazil", fact: "This country is the largest in South America." },
+                    { name: "India", fact: "This country has the second-largest population." }
+                ],
+                medium: [
+                    { name: "China", fact: "This country has the largest population in the world." },
+                    { name: "Russia", fact: "This country is the largest by land area." },
+                    { name: "Germany", fact: "This country has the largest economy in Europe." }
+                ],
+                hard: [
+                    { name: "Kazakhstan", fact: "This is the largest landlocked country in the world." },
+                    { name: "Mongolia", fact: "This country has the lowest population density." },
+                    { name: "Liechtenstein", fact: "This country is one of the smallest in the world." }
+                ]
+            }
+        };
+
+        let currentCategory = "general";
+        let currentDifficulty = "easy";
+        let previousIndex = -1;
+        let score = 0;
+
+        function loadCountry() {
+            const questions = countries[currentCategory][currentDifficulty];
+            if (!questions || questions.length === 0) {
+                document.getElementById("fact").innerText = "No questions available for this category and difficulty.";
+                return;
+            }
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * questions.length);
+            } while (newIndex === previousIndex);
+            previousIndex = newIndex;
+
+            document.getElementById("fact").innerText = questions[newIndex].fact;
+            document.getElementById("guess").value = "";
+            document.getElementById("result").innerText = "";
+        }
+
+        function checkGuess() {
+            const userGuess = document.getElementById("guess").value.trim().toLowerCase();
+            const questions = countries[currentCategory][currentDifficulty];
+            if (!questions) return;
+            const correctCountry = questions[previousIndex].name.toLowerCase();
+            
+            if (userGuess === correctCountry) {
+                document.getElementById("result").innerText = "✅ Correct!";
+                document.getElementById("result").classList.add("correct");
+                document.getElementById("result").classList.remove("wrong");
+                score += 10;
+            } else {
+                document.getElementById("result").innerText = "❌ Wrong! Try again.";
+                document.getElementById("result").classList.add("wrong");
+                document.getElementById("result").classList.remove("correct");
+                score -= 5;
+            }
+            document.getElementById("score").innerText = `Score: ${score}`;
+        }
+
+        function nextCountry() {
+            loadCountry();
+        }
+
+        function changeCategory() {
+            currentCategory = document.getElementById("category").value;
+            loadCountry();
+        }
+
+        function changeDifficulty() {
+            currentDifficulty = document.getElementById("difficulty").value;
+            loadCountry();
+        }
+
+        loadCountry();
+    </script>
+</body>
+</html>
 
