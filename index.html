@@ -72,7 +72,15 @@
       <option value="general">General Facts</option>
       <option value="capitals">Capitals</option>
       <option value="gdp">GDP</option>
-      <!-- Add more categories as desired -->
+      <option value="population">Population</option>
+      <option value="military">Military</option>
+      <option value="tourism">Tourism</option>
+      <option value="languages">Languages</option>
+      <option value="history">History</option>
+      <option value="flag">Flag Colors</option>
+      <option value="currency">Currency</option>
+      <option value="exports">Exports</option>
+      <option value="geography">Geography</option>
     </select>
     <br>
     <label for="difficulty">Choose difficulty:</label>
@@ -84,6 +92,7 @@
     <br>
     <button onclick="startGame()">Start Game</button>
     <button onclick="toggleTheme()">Toggle Dark Mode</button>
+    <button onclick="toggleMusic()">Toggle Music</button>
   </div>
 
   <!-- Game container: shown once game starts -->
@@ -110,7 +119,7 @@
   </div>
 
   <script>
-    // Question data organized by category and difficulty.
+    // Expanded question data for multiple categories.
     const countries = {
       general: {
         easy: [
@@ -149,7 +158,7 @@
           { name: "Bhutan", fact: "This country's capital is Thimphu." },
           { name: "Malawi", fact: "This country's capital is Lilongwe." },
           { name: "Lesotho", fact: "This country's capital is Maseru." },
-          { name: "Eswatini", fact: "This country's capital is Mbabane (administrative) and Lobamba (royal/legislative)." }
+          { name: "Eswatini", fact: "This country's capitals are Mbabane (administrative) and Lobamba (royal/legislative)." }
         ]
       },
       gdp: {
@@ -171,14 +180,141 @@
           { name: "Norway", fact: "This country is known for its high GDP per capita." },
           { name: "Singapore", fact: "This country has a very high GDP per capita due to its financial sector." }
         ]
+      },
+      population: {
+        easy: [
+          { name: "India", fact: "This country is the second-most populous in the world." },
+          { name: "USA", fact: "This country has the third-largest population globally." }
+        ],
+        medium: [
+          { name: "Indonesia", fact: "This country is the fourth-most populous in the world." },
+          { name: "Pakistan", fact: "This country ranks fifth in population." }
+        ],
+        hard: [
+          { name: "Bangladesh", fact: "This country is one of the most densely populated in the world." },
+          { name: "Nigeria", fact: "This country is expected to become the third-most populous by mid-century." }
+        ]
+      },
+      military: {
+        easy: [
+          { name: "USA", fact: "This country has the most powerful military in the world." },
+          { name: "Russia", fact: "This country has one of the largest military forces." }
+        ],
+        medium: [
+          { name: "China", fact: "This country has been rapidly modernizing its military." },
+          { name: "India", fact: "This country has one of the largest standing armies in the world." }
+        ],
+        hard: [
+          { name: "North Korea", fact: "This country has one of the largest militaries by manpower." },
+          { name: "Israel", fact: "This country is known for its advanced military technology despite its small size." }
+        ]
+      },
+      tourism: {
+        easy: [
+          { name: "France", fact: "This country is the most visited country in the world." },
+          { name: "Spain", fact: "This country is a top destination for European tourists." }
+        ],
+        medium: [
+          { name: "Italy", fact: "This country attracts millions with its rich cultural heritage." },
+          { name: "USA", fact: "This country is known for its diverse tourist attractions." }
+        ],
+        hard: [
+          { name: "Thailand", fact: "This country is famous for its vibrant tourism industry in Asia." },
+          { name: "Mexico", fact: "This country is a popular destination for its beaches and cultural sites." }
+        ]
+      },
+      languages: {
+        easy: [
+          { name: "Spain", fact: "Spanish is the official language of this country." },
+          { name: "France", fact: "French is the official language of this country." }
+        ],
+        medium: [
+          { name: "Germany", fact: "German is the official language of this country." },
+          { name: "Italy", fact: "Italian is the official language of this country." }
+        ],
+        hard: [
+          { name: "Switzerland", fact: "This country has four national languages: German, French, Italian, and Romansh." },
+          { name: "Belgium", fact: "This country has three official languages: Dutch, French, and German." }
+        ]
+      },
+      history: {
+        easy: [
+          { name: "USA", fact: "This country declared independence in 1776." },
+          { name: "France", fact: "This country experienced a major revolution in 1789." }
+        ],
+        medium: [
+          { name: "Russia", fact: "This country underwent a revolution in 1917." },
+          { name: "China", fact: "This country experienced a major cultural revolution in the 1960s." }
+        ],
+        hard: [
+          { name: "Germany", fact: "This country was divided after World War II and reunited in 1990." },
+          { name: "South Africa", fact: "This country ended apartheid in the early 1990s." }
+        ]
+      },
+      flag: {
+        easy: [
+          { name: "Japan", fact: "This country's flag features a red circle on a white background." },
+          { name: "Switzerland", fact: "This country's flag is red with a white cross." }
+        ],
+        medium: [
+          { name: "Brazil", fact: "This country's flag features a green field with a yellow diamond and blue globe." },
+          { name: "India", fact: "This country's flag has three horizontal stripes of saffron, white, and green with a blue wheel." }
+        ],
+        hard: [
+          { name: "South Africa", fact: "This country's flag is one of the most colorful and complex in design." },
+          { name: "Spain", fact: "This country's flag features red and yellow with a coat of arms." }
+        ]
+      },
+      currency: {
+        easy: [
+          { name: "USA", fact: "This country uses the Dollar." },
+          { name: "Japan", fact: "This country uses the Yen." }
+        ],
+        medium: [
+          { name: "United Kingdom", fact: "This country uses the Pound Sterling." },
+          { name: "Switzerland", fact: "This country uses the Swiss Franc." }
+        ],
+        hard: [
+          { name: "India", fact: "This country uses the Indian Rupee." },
+          { name: "South Africa", fact: "This country uses the Rand." }
+        ]
+      },
+      exports: {
+        easy: [
+          { name: "China", fact: "This country is the world's largest exporter of goods." },
+          { name: "USA", fact: "This country is a major exporter of technology and services." }
+        ],
+        medium: [
+          { name: "Germany", fact: "This country is known for exporting high-quality automobiles." },
+          { name: "South Korea", fact: "This country exports a lot of electronics and automobiles." }
+        ],
+        hard: [
+          { name: "Netherlands", fact: "This country is one of the world's largest exporters of agricultural products." },
+          { name: "Belgium", fact: "This country is known for exporting chocolates and diamonds." }
+        ]
+      },
+      geography: {
+        easy: [
+          { name: "Egypt", fact: "This country is home to the Nile River." },
+          { name: "Australia", fact: "This country is the smallest continent." }
+        ],
+        medium: [
+          { name: "Canada", fact: "This country is the second-largest in the world by land area." },
+          { name: "Russia", fact: "This country spans across eleven time zones." }
+        ],
+        hard: [
+          { name: "Brazil", fact: "This country has the largest rainforest in the world." },
+          { name: "India", fact: "This country has a diverse range of geographical features, from the Himalayas to tropical coasts." }
+        ]
       }
-      // Add additional categories if desired.
     };
 
     // Sound effects
     const correctSound = new Audio('correct-156911.mp3');
-    const wrongSound = new Audio('buzzer-or-wrong-answer-20582.mp3');
-    
+    const wrongSound = new Audio('');
+    const bgMusic = new Audio('bgMusic.mp3');
+    bgMusic.loop = true; // loop background music
+
     // Global game state variables.
     let currentCategory, currentDifficulty, currentQuestions, currentQuestionIndex, score, timer, timeLeft, hintUsed, playerName;
 
@@ -199,6 +335,8 @@
       document.getElementById("score").innerText = `Score: ${score}`;
 
       loadQuestion();
+      // Start background music if not already playing.
+      if(bgMusic.paused) bgMusic.play();
     }
 
     // Loads the current question or ends the game if no more questions.
@@ -235,7 +373,6 @@
           document.getElementById("score").innerText = `Score: ${score}`;
           document.getElementById("guess").disabled = true;
           document.querySelector('button[onclick="checkGuess()"]').disabled = true;
-          // Auto-move to next question after time up
         }
       }, 1000);
     }
@@ -320,6 +457,15 @@
       document.getElementById("lobby").classList.toggle("dark-mode");
       document.getElementById("game-container").classList.toggle("dark-container");
       document.getElementById("game-over").classList.toggle("dark-container");
+    }
+
+    // Toggles background music on or off.
+    function toggleMusic() {
+      if(bgMusic.paused){
+        bgMusic.play();
+      } else {
+        bgMusic.pause();
+      }
     }
   </script>
 </body>
