@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,6 @@
             text-align: center;
             padding: 20px;
             background-color: #f4f4f4;
-            margin: 0;
         }
         #game-container {
             max-width: 600px;
@@ -18,7 +17,7 @@
             padding: 20px;
             background: white;
             border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
         }
         input, button, select {
             margin-top: 10px;
@@ -31,7 +30,6 @@
             border: none;
             cursor: pointer;
             border-radius: 5px;
-            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #0056b3;
@@ -39,31 +37,31 @@
         #result {
             font-weight: bold;
             margin-top: 10px;
+        }
+        #timer {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        body.dark-mode {
+            background-color: #333;
+            color: white;
+        }
+        #game-container.dark-container {
+            background-color: #444;
+            color: white;
+        }
+        #leaderboard {
+            margin-top: 20px;
+            text-align: left;
             padding: 10px;
-        }
-        #result.correct {
-            color: green;
-        }
-        #result.wrong {
-            color: red;
-        }
-        select {
-            width: 200px;
-        }
-        @media (max-width: 600px) {
-            #game-container {
-                width: 90%;
-            }
-            select {
-                width: 100%;
-            }
         }
     </style>
 </head>
 <body>
     <div id="game-container">
         <h1>Guess the Country!</h1>
-        <p id="category-name">Category: General Facts</p>
+        <button onclick="toggleTheme()">Toggle Dark Mode</button>
+        <div id="timer">Time Left: 10s</div>
         <label for="category">Choose a category:</label>
         <select id="category" onchange="changeCategory()">
             <option value="general">General Facts</option>
@@ -80,7 +78,6 @@
             <option value="exports">Major Exports</option>
             <option value="geography">Geography</option>
         </select>
-        <br>
         <label for="difficulty">Choose difficulty:</label>
         <select id="difficulty" onchange="changeDifficulty()">
             <option value="easy">Easy</option>
@@ -88,11 +85,13 @@
             <option value="hard">Hard</option>
         </select>
         <p id="fact"></p>
-        <input type="text" id="guess" placeholder="Enter country name" aria-label="Country name input">
+        <input type="text" id="guess" placeholder="Enter country name">
         <button onclick="checkGuess()">Submit</button>
-        <p id="result"></p>
+        <button onclick="getHint()">Get Hint</button>
         <button onclick="nextCountry()">Next</button>
+        <p id="result"></p>
         <p id="score">Score: 0</p>
+        <div id="leaderboard"></div>
     </div>
 
     <script>
@@ -113,30 +112,38 @@
                     { name: "Mongolia", fact: "This country has the lowest population density." },
                     { name: "Liechtenstein", fact: "This country is one of the smallest in the world." }
                 ]
-            },
-            capitals: {
-                easy: [
-                    { name: "France", fact: "The capital of this country is Paris." },
-                    { name: "Japan", fact: "The capital of this country is Tokyo." }
-                ],
-                medium: [
-                    { name: "USA", fact: "The capital of this country is Washington, D.C." },
-                    { name: "Germany", fact: "The capital of this country is Berlin." }
-                ],
-                hard: [
-                    { name: "Palau", fact: "The capital of this country is Ngerulmud." },
-                    { name: "Bhutan", fact: "The capital of this country is Thimphu." }
-                ]
-            },
-            // Add more categories and questions as needed
+            }
         };
 
         let currentCategory = "general";
         let currentDifficulty = "easy";
         let previousIndex = -1;
         let score = 0;
+        let timer;
+        let timeLeft = 10;
+        let hintUsed = false;
+
+        function startTimer() {
+            timeLeft = 10; 
+            document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById("result").innerText = "❌ Time's Up!";
+                    document.getElementById("result").classList.add("wrong");
+                    document.getElementById("result").classList.remove("correct");
+                    score -= 5;
+                    document.getElementById("score").innerText = `Score: ${score}`;
+                    document.getElementById("guess").disabled = true;
+                    document.querySelector('button[onclick="checkGuess()"]').disabled = true;
+                }
+            }, 1000);
+        }
 
         function loadCountry() {
+            startTimer();
             const questions = countries[currentCategory][currentDifficulty];
             if (!questions || questions.length === 0) {
                 document.getElementById("fact").innerText = "No questions available for this category and difficulty.";
@@ -151,12 +158,14 @@
             document.getElementById("fact").innerText = questions[newIndex].fact;
             document.getElementById("guess").value = "";
             document.getElementById("result").innerText = "";
+            hintUsed = false;
+            document.getElementById("guess").disabled = false;
+            document.querySelector('button[onclick="checkGuess()"]').disabled = false;
         }
 
         function checkGuess() {
             const userGuess = document.getElementById("guess").value.trim().toLowerCase();
             const questions = countries[currentCategory][currentDifficulty];
-            if (!questions) return;
             const correctCountry = questions[previousIndex].name.toLowerCase();
 
             if (userGuess === correctCountry) {
@@ -171,35 +180,57 @@
                 score -= 5;
             }
             document.getElementById("score").innerText = `Score: ${score}`;
-            document.getElementById("guess").disabled = true; // Disable input after answering
-            document.querySelector('button[onclick="checkGuess()"]').disabled = true; // Disable submit button
         }
 
         function nextCountry() {
-            document.getElementById("guess").disabled = false; // Enable input for the next question
-            document.querySelector('button[onclick="checkGuess()"]').disabled = false; // Enable submit button
-            loadCountry(); // Load a new question
-            document.getElementById("result").innerText = ""; // Reset result text
+            loadCountry();
         }
 
         function changeCategory() {
             currentCategory = document.getElementById("category").value;
-            document.getElementById("category-name").innerText = `Category: ${document.getElementById("category").options[document.getElementById("category").selectedIndex].text}`;
-            resetGame(); // Reset the game when changing the category
+            loadCountry();
         }
 
         function changeDifficulty() {
             currentDifficulty = document.getElementById("difficulty").value;
-            loadCountry(); // Load a new question based on difficulty change
+            loadCountry();
         }
 
-        function resetGame() {
-            score = 0;
-            document.getElementById("score").innerText = `Score: ${score}`;
-            loadCountry(); // Load a question from the new category
+        function getHint() {
+            if (hintUsed) {
+                document.getElementById("result").innerText = "❌ You have already used a hint!";
+            } else {
+                const hint = countries[currentCategory][currentDifficulty][previousIndex].name.charAt(0);
+                document.getElementById("result").innerText = `Hint: The country starts with '${hint}'.`;
+                hintUsed = true;
+                score -= 3;
+                document.getElementById("score").innerText = `Score: ${score}`;
+            }
         }
 
-        loadCountry(); // Initial question load
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            document.getElementById("game-container").classList.toggle('dark-container');
+        }
+
+        function updateLeaderboard() {
+            let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+            highScores.push(score);
+            highScores.sort((a, b) => b - a); 
+            highScores = highScores.slice(0, 5); 
+            localStorage.setItem("highScores", JSON.stringify(highScores));
+            displayLeaderboard(highScores);
+        }
+
+        function displayLeaderboard(scores) {
+            let leaderboard = document.getElementById("leaderboard");
+            leaderboard.innerHTML = "<h3>Leaderboard</h3>";
+            scores.forEach((score, index) => {
+                leaderboard.innerHTML += `<p>${index + 1}. Score: ${score}</p>`;
+            });
+        }
+
+        loadCountry();
     </script>
 </body>
 </html>
