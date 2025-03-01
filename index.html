@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -113,7 +113,22 @@
                     { name: "Mongolia", fact: "This country has the lowest population density." },
                     { name: "Liechtenstein", fact: "This country is one of the smallest in the world." }
                 ]
-            }
+            },
+            capitals: {
+                easy: [
+                    { name: "France", fact: "The capital of this country is Paris." },
+                    { name: "Japan", fact: "The capital of this country is Tokyo." }
+                ],
+                medium: [
+                    { name: "USA", fact: "The capital of this country is Washington, D.C." },
+                    { name: "Germany", fact: "The capital of this country is Berlin." }
+                ],
+                hard: [
+                    { name: "Palau", fact: "The capital of this country is Ngerulmud." },
+                    { name: "Bhutan", fact: "The capital of this country is Thimphu." }
+                ]
+            },
+            // Add more categories and questions as needed
         };
 
         let currentCategory = "general";
@@ -181,7 +196,7 @@
         function resetGame() {
             score = 0;
             document.getElementById("score").innerText = `Score: ${score}`;
-            loadCountry(); // Load a question from the new category and difficulty
+            loadCountry(); // Load a question from the new category
         }
 
         loadCountry(); // Initial question load
