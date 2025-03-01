@@ -112,7 +112,8 @@
                     { name: "Mongolia", fact: "This country has the lowest population density." },
                     { name: "Liechtenstein", fact: "This country is one of the smallest in the world." }
                 ]
-            }
+            },
+            // Add more categories like capitals, GDP, etc. here
         };
 
         let currentCategory = "general";
@@ -124,8 +125,9 @@
         let hintUsed = false;
 
         function startTimer() {
-            timeLeft = 10; 
+            timeLeft = 10;
             document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
+            clearInterval(timer); // Clear any existing timer
             timer = setInterval(() => {
                 timeLeft--;
                 document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
@@ -143,7 +145,6 @@
         }
 
         function loadCountry() {
-            startTimer();
             const questions = countries[currentCategory][currentDifficulty];
             if (!questions || questions.length === 0) {
                 document.getElementById("fact").innerText = "No questions available for this category and difficulty.";
@@ -161,6 +162,7 @@
             hintUsed = false;
             document.getElementById("guess").disabled = false;
             document.querySelector('button[onclick="checkGuess()"]').disabled = false;
+            startTimer();
         }
 
         function checkGuess() {
@@ -216,8 +218,8 @@
         function updateLeaderboard() {
             let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
             highScores.push(score);
-            highScores.sort((a, b) => b - a); 
-            highScores = highScores.slice(0, 5); 
+            highScores.sort((a, b) => b - a); // Sort in descending order
+            highScores = highScores.slice(0, 5); // Keep only top 5 scores
             localStorage.setItem("highScores", JSON.stringify(highScores));
             displayLeaderboard(highScores);
         }
@@ -230,7 +232,9 @@
             });
         }
 
+        // Initialize the game
         loadCountry();
     </script>
 </body>
 </html>
+
