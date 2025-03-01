@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -50,11 +50,6 @@
             background-color: #444;
             color: white;
         }
-        #leaderboard {
-            margin-top: 20px;
-            text-align: left;
-            padding: 10px;
-        }
     </style>
 </head>
 <body>
@@ -91,7 +86,6 @@
         <button onclick="nextCountry()">Next</button>
         <p id="result"></p>
         <p id="score">Score: 0</p>
-        <div id="leaderboard"></div>
     </div>
 
     <script>
@@ -113,7 +107,41 @@
                     { name: "Liechtenstein", fact: "This country is one of the smallest in the world." }
                 ]
             },
-            // Add more categories like capitals, GDP, etc. here
+            capitals: {
+                easy: [
+                    { name: "Australia", fact: "This country's capital is Canberra." },
+                    { name: "USA", fact: "This country's capital is Washington, D.C." },
+                    { name: "France", fact: "This country's capital is Paris." }
+                ],
+                medium: [
+                    { name: "Japan", fact: "This country's capital is Tokyo." },
+                    { name: "Italy", fact: "This country's capital is Rome." },
+                    { name: "Canada", fact: "This country's capital is Ottawa." }
+                ],
+                hard: [
+                    { name: "Bhutan", fact: "This country's capital is Thimphu." },
+                    { name: "Malawi", fact: "This country's capital is Lilongwe." },
+                    { name: "Lesotho", fact: "This country's capital is Maseru." }
+                ]
+            },
+            gdp: {
+                easy: [
+                    { name: "USA", fact: "This country has the largest GDP in the world." },
+                    { name: "China", fact: "This country has the second-largest GDP in the world." },
+                    { name: "Germany", fact: "This country has the largest GDP in Europe." }
+                ],
+                medium: [
+                    { name: "India", fact: "This country has the fifth-largest GDP in the world." },
+                    { name: "Japan", fact: "This country has the third-largest GDP in the world." },
+                    { name: "United Kingdom", fact: "This country has the sixth-largest GDP in the world." }
+                ],
+                hard: [
+                    { name: "Luxembourg", fact: "This country has the highest GDP per capita." },
+                    { name: "Switzerland", fact: "This country has one of the highest GDPs per capita." },
+                    { name: "Norway", fact: "This country is known for its high GDP per capita." }
+                ]
+            }
+            // More categories can be added similarly
         };
 
         let currentCategory = "general";
@@ -215,26 +243,8 @@
             document.getElementById("game-container").classList.toggle('dark-container');
         }
 
-        function updateLeaderboard() {
-            let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
-            highScores.push(score);
-            highScores.sort((a, b) => b - a); // Sort in descending order
-            highScores = highScores.slice(0, 5); // Keep only top 5 scores
-            localStorage.setItem("highScores", JSON.stringify(highScores));
-            displayLeaderboard(highScores);
-        }
-
-        function displayLeaderboard(scores) {
-            let leaderboard = document.getElementById("leaderboard");
-            leaderboard.innerHTML = "<h3>Leaderboard</h3>";
-            scores.forEach((score, index) => {
-                leaderboard.innerHTML += `<p>${index + 1}. Score: ${score}</p>`;
-            });
-        }
-
         // Initialize the game
         loadCountry();
     </script>
 </body>
 </html>
-
