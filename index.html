@@ -1,250 +1,289 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess the Country</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        #game-container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
-        }
-        input, button, select {
-            margin-top: 10px;
-            padding: 10px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #result {
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        #timer {
-            font-size: 18px;
-            margin-top: 10px;
-        }
-        body.dark-mode {
-            background-color: #333;
-            color: white;
-        }
-        #game-container.dark-container {
-            background-color: #444;
-            color: white;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guess the Country Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f4f4f4;
+      margin: 0;
+    }
+    #lobby, #game-container, #game-over {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    }
+    input, button, select {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    #timer {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+    body.dark-mode {
+      background-color: #333;
+      color: white;
+    }
+    #lobby.dark-mode, #game-container.dark-container, #game-over.dark-container {
+      background-color: #444;
+      color: white;
+    }
+  </style>
 </head>
 <body>
-    <div id="game-container">
-        <h1>Guess the Country!</h1>
-        <button onclick="toggleTheme()">Toggle Dark Mode</button>
-        <div id="timer">Time Left: 10s</div>
-        <label for="category">Choose a category:</label>
-        <select id="category" onchange="changeCategory()">
-            <option value="general">General Facts</option>
-            <option value="capitals">Capitals</option>
-            <option value="gdp">GDP</option>
-            <option value="size">Size</option>
-            <option value="military">Military Rank</option>
-            <option value="population">Population</option>
-            <option value="tourism">Tourism</option>
-            <option value="languages">Languages</option>
-            <option value="history">Historical Events</option>
-            <option value="flag">Flag Colors</option>
-            <option value="currency">Currency</option>
-            <option value="exports">Major Exports</option>
-            <option value="geography">Geography</option>
-        </select>
-        <label for="difficulty">Choose difficulty:</label>
-        <select id="difficulty" onchange="changeDifficulty()">
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-        </select>
-        <p id="fact"></p>
-        <input type="text" id="guess" placeholder="Enter country name">
-        <button onclick="checkGuess()">Submit</button>
-        <button onclick="getHint()">Get Hint</button>
-        <button onclick="nextCountry()">Next</button>
-        <p id="result"></p>
-        <p id="score">Score: 0</p>
-    </div>
+  <!-- Lobby: Pre-game screen -->
+  <div id="lobby">
+    <h1>Welcome to Guess the Country!</h1>
+    <label for="playerName">Enter Your Name:</label>
+    <br>
+    <input type="text" id="playerName" placeholder="Your name" />
+    <br>
+    <label for="category">Choose a category:</label>
+    <select id="category">
+      <option value="general">General Facts</option>
+      <option value="capitals">Capitals</option>
+      <option value="gdp">GDP</option>
+      <!-- Add more categories as desired -->
+    </select>
+    <br>
+    <label for="difficulty">Choose difficulty:</label>
+    <select id="difficulty">
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+    <br>
+    <button onclick="startGame()">Start Game</button>
+    <button onclick="toggleTheme()">Toggle Dark Mode</button>
+  </div>
 
-    <script>
-        const countries = {
-            general: {
-                easy: [
-                    { name: "Canada", fact: "This country has the longest coastline in the world." },
-                    { name: "Brazil", fact: "This country is the largest in South America." },
-                    { name: "India", fact: "This country has the second-largest population." }
-                ],
-                medium: [
-                    { name: "China", fact: "This country has the largest population in the world." },
-                    { name: "Russia", fact: "This country is the largest by land area." },
-                    { name: "Germany", fact: "This country has the largest economy in Europe." }
-                ],
-                hard: [
-                    { name: "Kazakhstan", fact: "This is the largest landlocked country in the world." },
-                    { name: "Mongolia", fact: "This country has the lowest population density." },
-                    { name: "Liechtenstein", fact: "This country is one of the smallest in the world." }
-                ]
-            },
-            capitals: {
-                easy: [
-                    { name: "Australia", fact: "This country's capital is Canberra." },
-                    { name: "USA", fact: "This country's capital is Washington, D.C." },
-                    { name: "France", fact: "This country's capital is Paris." }
-                ],
-                medium: [
-                    { name: "Japan", fact: "This country's capital is Tokyo." },
-                    { name: "Italy", fact: "This country's capital is Rome." },
-                    { name: "Canada", fact: "This country's capital is Ottawa." }
-                ],
-                hard: [
-                    { name: "Bhutan", fact: "This country's capital is Thimphu." },
-                    { name: "Malawi", fact: "This country's capital is Lilongwe." },
-                    { name: "Lesotho", fact: "This country's capital is Maseru." }
-                ]
-            },
-            gdp: {
-                easy: [
-                    { name: "USA", fact: "This country has the largest GDP in the world." },
-                    { name: "China", fact: "This country has the second-largest GDP in the world." },
-                    { name: "Germany", fact: "This country has the largest GDP in Europe." }
-                ],
-                medium: [
-                    { name: "India", fact: "This country has the fifth-largest GDP in the world." },
-                    { name: "Japan", fact: "This country has the third-largest GDP in the world." },
-                    { name: "United Kingdom", fact: "This country has the sixth-largest GDP in the world." }
-                ],
-                hard: [
-                    { name: "Luxembourg", fact: "This country has the highest GDP per capita." },
-                    { name: "Switzerland", fact: "This country has one of the highest GDPs per capita." },
-                    { name: "Norway", fact: "This country is known for its high GDP per capita." }
-                ]
-            }
-            // More categories can be added similarly
-        };
+  <!-- Game container: shown once game starts -->
+  <div id="game-container" style="display: none;">
+    <h2 id="greeting"></h2>
+    <div id="timer">Time Left: 10s</div>
+    <p id="progress"></p>
+    <p id="fact"></p>
+    <input type="text" id="guess" placeholder="Enter country name" />
+    <br>
+    <button onclick="checkGuess()">Submit Answer</button>
+    <button onclick="getHint()">Get Hint</button>
+    <button onclick="nextQuestion()">Next Question</button>
+    <p id="result"></p>
+    <p id="score">Score: 0</p>
+  </div>
 
-        let currentCategory = "general";
-        let currentDifficulty = "easy";
-        let previousIndex = -1;
-        let score = 0;
-        let timer;
-        let timeLeft = 10;
-        let hintUsed = false;
+  <!-- Game Over screen -->
+  <div id="game-over" style="display: none;">
+    <h2>Game Over!</h2>
+    <p id="finalScore"></p>
+    <button onclick="returnToLobby()">Return to Lobby</button>
+  </div>
 
-        function startTimer() {
-            timeLeft = 10;
-            document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
-            clearInterval(timer); // Clear any existing timer
-            timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    document.getElementById("result").innerText = "❌ Time's Up!";
-                    document.getElementById("result").classList.add("wrong");
-                    document.getElementById("result").classList.remove("correct");
-                    score -= 5;
-                    document.getElementById("score").innerText = `Score: ${score}`;
-                    document.getElementById("guess").disabled = true;
-                    document.querySelector('button[onclick="checkGuess()"]').disabled = true;
-                }
-            }, 1000);
+  <script>
+    // Question data organized by category and difficulty.
+    const countries = {
+      general: {
+        easy: [
+          { name: "Canada", fact: "This country has the longest coastline in the world." },
+          { name: "Brazil", fact: "This country is the largest in South America." },
+          { name: "India", fact: "This country has the second-largest population." }
+        ],
+        medium: [
+          { name: "China", fact: "This country has the largest population in the world." },
+          { name: "Russia", fact: "This country is the largest by land area." },
+          { name: "Germany", fact: "This country has the largest economy in Europe." }
+        ],
+        hard: [
+          { name: "Kazakhstan", fact: "This is the largest landlocked country in the world." },
+          { name: "Mongolia", fact: "This country has the lowest population density." },
+          { name: "Liechtenstein", fact: "This country is one of the smallest in the world." }
+        ]
+      },
+      capitals: {
+        easy: [
+          { name: "Australia", fact: "This country's capital is Canberra." },
+          { name: "USA", fact: "This country's capital is Washington, D.C." },
+          { name: "France", fact: "This country's capital is Paris." }
+        ],
+        medium: [
+          { name: "Japan", fact: "This country's capital is Tokyo." },
+          { name: "Italy", fact: "This country's capital is Rome." },
+          { name: "Canada", fact: "This country's capital is Ottawa." }
+        ],
+        hard: [
+          { name: "Bhutan", fact: "This country's capital is Thimphu." },
+          { name: "Malawi", fact: "This country's capital is Lilongwe." },
+          { name: "Lesotho", fact: "This country's capital is Maseru." }
+        ]
+      },
+      gdp: {
+        easy: [
+          { name: "USA", fact: "This country has the largest GDP in the world." },
+          { name: "China", fact: "This country has the second-largest GDP in the world." },
+          { name: "Germany", fact: "This country has the largest GDP in Europe." }
+        ],
+        medium: [
+          { name: "India", fact: "This country has the fifth-largest GDP in the world." },
+          { name: "Japan", fact: "This country has the third-largest GDP in the world." },
+          { name: "United Kingdom", fact: "This country has the sixth-largest GDP in the world." }
+        ],
+        hard: [
+          { name: "Luxembourg", fact: "This country has the highest GDP per capita." },
+          { name: "Switzerland", fact: "This country has one of the highest GDPs per capita." },
+          { name: "Norway", fact: "This country is known for its high GDP per capita." }
+        ]
+      }
+      // You can add more categories as needed.
+    };
+
+    // Global game state variables.
+    let currentCategory, currentDifficulty, currentQuestions, currentQuestionIndex, score, timer, timeLeft, hintUsed, playerName;
+
+    // Starts the game from the lobby.
+    function startGame() {
+      // Retrieve lobby values.
+      playerName = document.getElementById("playerName").value || "Player";
+      currentCategory = document.getElementById("category").value;
+      currentDifficulty = document.getElementById("difficulty").value;
+      currentQuestions = countries[currentCategory][currentDifficulty] || [];
+      currentQuestionIndex = 0;
+      score = 0;
+
+      // Hide lobby, show game container.
+      document.getElementById("lobby").style.display = "none";
+      document.getElementById("game-over").style.display = "none";
+      document.getElementById("game-container").style.display = "block";
+      document.getElementById("greeting").innerText = `Hello, ${playerName}!`;
+      document.getElementById("score").innerText = `Score: ${score}`;
+
+      loadQuestion();
+    }
+
+    // Loads the current question or ends the game if no more questions.
+    function loadQuestion() {
+      clearInterval(timer); // Clear any previous timer.
+      if (currentQuestionIndex >= currentQuestions.length) {
+        gameOver();
+        return;
+      }
+      hintUsed = false;
+      document.getElementById("guess").disabled = false;
+      document.querySelector('button[onclick="checkGuess()"]').disabled = false;
+      document.getElementById("guess").value = "";
+      document.getElementById("result").innerText = "";
+      // Display progress.
+      document.getElementById("progress").innerText = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
+      // Display the current fact.
+      document.getElementById("fact").innerText = currentQuestions[currentQuestionIndex].fact;
+      // Start the timer.
+      startTimer();
+    }
+
+    // Starts the countdown timer for the current question.
+    function startTimer() {
+      timeLeft = 10;
+      document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
+      timer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft < 0) timeLeft = 0; // Prevent negative display.
+        document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
+        if (timeLeft === 0) {
+          clearInterval(timer);
+          document.getElementById("result").innerText = "❌ Time's Up!";
+          document.getElementById("result").classList.add("wrong");
+          document.getElementById("result").classList.remove("correct");
+          score -= 5;
+          document.getElementById("score").innerText = `Score: ${score}`;
+          document.getElementById("guess").disabled = true;
+          document.querySelector('button[onclick="checkGuess()"]').disabled = true;
         }
+      }, 1000);
+    }
 
-        function loadCountry() {
-            const questions = countries[currentCategory][currentDifficulty];
-            if (!questions || questions.length === 0) {
-                document.getElementById("fact").innerText = "No questions available for this category and difficulty.";
-                return;
-            }
-            let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * questions.length);
-            } while (newIndex === previousIndex);
-            previousIndex = newIndex;
+    // Checks the player's guess against the current question.
+    function checkGuess() {
+      clearInterval(timer);
+      const userGuess = document.getElementById("guess").value.trim().toLowerCase();
+      const correctAnswer = currentQuestions[currentQuestionIndex].name.toLowerCase();
+      if (userGuess === correctAnswer) {
+        document.getElementById("result").innerText = "✅ Correct!";
+        document.getElementById("result").classList.add("correct");
+        document.getElementById("result").classList.remove("wrong");
+        score += 10;
+      } else {
+        document.getElementById("result").innerText = `❌ Incorrect! The correct answer is ${currentQuestions[currentQuestionIndex].name}.`;
+        document.getElementById("result").classList.add("wrong");
+        document.getElementById("result").classList.remove("correct");
+        score -= 5;
+      }
+      document.getElementById("score").innerText = `Score: ${score}`;
+    }
 
-            document.getElementById("fact").innerText = questions[newIndex].fact;
-            document.getElementById("guess").value = "";
-            document.getElementById("result").innerText = "";
-            hintUsed = false;
-            document.getElementById("guess").disabled = false;
-            document.querySelector('button[onclick="checkGuess()"]').disabled = false;
-            startTimer();
-        }
+    // Moves to the next question.
+    function nextQuestion() {
+      clearInterval(timer);
+      currentQuestionIndex++;
+      loadQuestion();
+    }
 
-        function checkGuess() {
-            const userGuess = document.getElementById("guess").value.trim().toLowerCase();
-            const questions = countries[currentCategory][currentDifficulty];
-            const correctCountry = questions[previousIndex].name.toLowerCase();
+    // Provides a hint (first letter of the country) for the current question.
+    function getHint() {
+      if (hintUsed) {
+        document.getElementById("result").innerText = "❌ You have already used a hint!";
+      } else {
+        const hintLetter = currentQuestions[currentQuestionIndex].name.charAt(0);
+        document.getElementById("result").innerText = `Hint: The country starts with '${hintLetter}'.`;
+        hintUsed = true;
+        score -= 3;
+        document.getElementById("score").innerText = `Score: ${score}`;
+      }
+    }
 
-            if (userGuess === correctCountry) {
-                document.getElementById("result").innerText = "✅ Correct!";
-                document.getElementById("result").classList.add("correct");
-                document.getElementById("result").classList.remove("wrong");
-                score += 10;
-            } else {
-                document.getElementById("result").innerText = `❌ Incorrect! The correct answer is ${questions[previousIndex].name}.`;
-                document.getElementById("result").classList.add("wrong");
-                document.getElementById("result").classList.remove("correct");
-                score -= 5;
-            }
-            document.getElementById("score").innerText = `Score: ${score}`;
-        }
+    // Ends the game and shows the Game Over screen.
+    function gameOver() {
+      clearInterval(timer);
+      document.getElementById("game-container").style.display = "none";
+      document.getElementById("game-over").style.display = "block";
+      document.getElementById("finalScore").innerText = `Final Score: ${score}`;
+    }
 
-        function nextCountry() {
-            loadCountry();
-        }
+    // Returns to the lobby to allow a new game.
+    function returnToLobby() {
+      document.getElementById("game-over").style.display = "none";
+      document.getElementById("lobby").style.display = "block";
+    }
 
-        function changeCategory() {
-            currentCategory = document.getElementById("category").value;
-            loadCountry();
-        }
-
-        function changeDifficulty() {
-            currentDifficulty = document.getElementById("difficulty").value;
-            loadCountry();
-        }
-
-        function getHint() {
-            if (hintUsed) {
-                document.getElementById("result").innerText = "❌ You have already used a hint!";
-            } else {
-                const hint = countries[currentCategory][currentDifficulty][previousIndex].name.charAt(0);
-                document.getElementById("result").innerText = `Hint: The country starts with '${hint}'.`;
-                hintUsed = true;
-                score -= 3;
-                document.getElementById("score").innerText = `Score: ${score}`;
-            }
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            document.getElementById("game-container").classList.toggle('dark-container');
-        }
-
-        // Initialize the game
-        loadCountry();
-    </script>
+    // Toggles between light and dark mode.
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+      document.getElementById("lobby").classList.toggle("dark-mode");
+      document.getElementById("game-container").classList.toggle("dark-container");
+      document.getElementById("game-over").classList.toggle("dark-container");
+    }
+  </script>
 </body>
 </html>
+
